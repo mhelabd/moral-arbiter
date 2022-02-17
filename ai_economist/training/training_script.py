@@ -17,6 +17,8 @@ from re import S
 
 import GPUtil
 
+from ai_economist.foundation.scenarios import simple_wood_and_stone
+
 try:
     num_gpus_available = len(GPUtil.getAvailable())
     assert num_gpus_available > 0, "This training script needs a GPU to run!"
@@ -36,11 +38,10 @@ except ValueError:
 from ai_economist.foundation.env_wrapper import FoundationEnvWrapper
 from ai_economist.foundation.base.base_env import scenario_registry as s
 
-MoralUniform = s.get('moral_uniform/simple_wood_and_stone')
 
 pytorch_cuda_nit_success = torch.cuda.FloatTensor(8)
 MORAL_ECONOMY = "moral_economy"
-
+SIMPLE_WOOD_AND_STONE = "simple_wood_and_stone"
 # Usage:
 # >> python ai_economist/training/example_training_script.py
 # --env covid_and_economy_environment
@@ -56,9 +57,9 @@ if __name__ == "__main__":
     # Read the run configurations specific to each environment.
     # Note: The run config yamls are located at warp_drive/training/run_configs
     # ---------------------------------------------------------------------------
-    assert args.env in [MORAL_ECONOMY], (
+    assert args.env in [MORAL_ECONOMY, SIMPLE_WOOD_AND_STONE], (
         f"Currently, the only environment supported "
-        f"is {MORAL_ECONOMY}"
+        f"is {MORAL_ECONOMY}, {SIMPLE_WOOD_AND_STONE}"
     )
 
     config_path = os.path.join(
@@ -77,6 +78,7 @@ if __name__ == "__main__":
     if run_config["name"] == MORAL_ECONOMY:
         env_registry = EnvironmentRegistrar()
         this_file_dir = os.path.dirname(os.path.abspath(__file__))
+        MoralUniform = s.get('moral_uniform/simple_wood_and_stone')
         env_registry.add_cuda_env_src_path(
             MoralUniform.name,
             os.path.join(
@@ -85,6 +87,23 @@ if __name__ == "__main__":
         )
         env_wrapper = FoundationEnvWrapper(
             MoralUniform(**run_config["env"]),
+            num_envs=num_envs,
+            use_cuda=True,
+            customized_env_registrar=env_registry,
+        )
+    elif run_config["name"] == SIMPLE_WOOD_AND_STONE:
+        env_registry = EnvironmentRegistrar()
+        this_file_dir = os.path.dirname(os.path.abspath(__file__))
+        
+        uniform = s.get('uniform/simple_wood_and_stone')
+        env_registry.add_cuda_env_src_path(
+            uniform.name,
+            os.path.join(
+                this_file_dir, "../foundation/scenarios/covid19/covid19_build.cu"
+            ),
+        )
+        env_wrapper = FoundationEnvWrapper(
+            uniform(**run_config["env"]),
             num_envs=num_envs,
             use_cuda=True,
             customized_env_registrar=env_registry,
