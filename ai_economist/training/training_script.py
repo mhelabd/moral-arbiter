@@ -36,10 +36,10 @@ except ValueError:
 from ai_economist.foundation.env_wrapper import FoundationEnvWrapper
 import ai_economist.foundation.scenarios as s
 
-print(s.entries())
+print(s.entries)
 MoralUniform = s.get('moral_uniform/simple_wood_and_stone')
 
-pytorch_cuda_init_success = torch.cuda.FloatTensor(8)
+pytorch_cuda_nit_success = torch.cuda.FloatTensor(8)
 MORAL_ECONOMY = "moral_economy"
 
 # Usage:
