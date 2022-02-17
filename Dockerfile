@@ -18,9 +18,12 @@ ENV PATH=/home/miniconda/bin:${PATH}
 RUN conda update -y conda
 
 # Python packages from conda
-RUN conda install -c anaconda -y python=3.7.2
+RUN conda install -c anaconda -y python=3.7
 RUN conda install -c anaconda -y pip
 RUN pip install ai-economist
+RUN pip install gym==0.21
+RUN pip install tensorflow==1.14
+RUN pip install "ray[rllib]==0.8.4"
 RUN pip install rl_warp_drive
 RUN apt-get update && apt-get install -y git
 ARG commit
