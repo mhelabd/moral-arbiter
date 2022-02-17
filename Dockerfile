@@ -27,7 +27,9 @@ RUN pip install "ray[rllib]==0.8.4"
 RUN pip install rl_warp_drive
 RUN apt-get update && apt-get install -y git
 ARG commit
-RUN echo "$commit" && git clone https://github.com/mhelabd/ai-ethicist.git
+# RUN echo "$commit" && git clone https://github.com/mhelabd/ai-ethicist.git
+RUN echo "$commit"
+ADD . /home/ai-ethicist
 # RUN cd ai-ethicist && git checkout $commit
 RUN echo "PWD is: $PWD"
 CMD [ "python", "./ai-ethicist/ai_economist/training/training_script.py", "--env", "./ai-ethicist/ai_economist/training/run_configs/moral_environment.yaml " ] 
