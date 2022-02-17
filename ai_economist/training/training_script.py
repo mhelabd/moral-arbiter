@@ -13,6 +13,7 @@ using `pip install rl-warp-drive`, and Pytorch(https://pytorch.org/)
 
 import argparse
 import os
+from re import S
 
 import GPUtil
 
@@ -33,11 +34,11 @@ except ValueError:
     raise ValueError("This training script needs a GPU to run!") from None
 
 from ai_economist.foundation.env_wrapper import FoundationEnvWrapper
-from ai_economist.foundation.scenarios.moral_economy.moral_dynamic_layout import (
-    MoralUniform,
-)
+from ai_economist.foundation.base.base_env import scenario_registry as s
 
-pytorch_cuda_init_success = torch.cuda.FloatTensor(8)
+MoralUniform = s.get('moral_uniform/simple_wood_and_stone')
+
+pytorch_cuda_nit_success = torch.cuda.FloatTensor(8)
 MORAL_ECONOMY = "moral_economy"
 
 # Usage:
