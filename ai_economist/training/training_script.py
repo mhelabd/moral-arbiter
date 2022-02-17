@@ -33,12 +33,12 @@ except ValueError:
     raise ValueError("This training script needs a GPU to run!") from None
 
 from ai_economist.foundation.env_wrapper import FoundationEnvWrapper
-from ai_economist.foundation.scenarios.covid19.covid19_env import (
-    CovidAndEconomyEnvironment,
+from ai_economist.foundation.scenarios.moral_economy.moral_dynamic_layout import (
+    MoralUniform,
 )
 
 pytorch_cuda_init_success = torch.cuda.FloatTensor(8)
-_COVID_AND_ECONOMY_ENVIRONMENT = "covid_and_economy_environment"
+MORAL_ECONOMY = "moral_economy"
 
 # Usage:
 # >> python ai_economist/training/example_training_script.py
@@ -55,9 +55,9 @@ if __name__ == "__main__":
     # Read the run configurations specific to each environment.
     # Note: The run config yamls are located at warp_drive/training/run_configs
     # ---------------------------------------------------------------------------
-    assert args.env in [_COVID_AND_ECONOMY_ENVIRONMENT], (
+    assert args.env in [MORAL_ECONOMY], (
         f"Currently, the only environment supported "
-        f"is {_COVID_AND_ECONOMY_ENVIRONMENT}"
+        f"is {MORAL_ECONOMY}"
     )
 
     config_path = os.path.join(
@@ -73,17 +73,17 @@ if __name__ == "__main__":
     # Create a wrapped environment object via the EnvWrapper
     # Ensure that use_cuda is set to True (in order to run on the GPU)
     # ----------------------------------------------------------------
-    if run_config["name"] == _COVID_AND_ECONOMY_ENVIRONMENT:
+    if run_config["name"] == MORAL_ECONOMY:
         env_registry = EnvironmentRegistrar()
         this_file_dir = os.path.dirname(os.path.abspath(__file__))
         env_registry.add_cuda_env_src_path(
-            CovidAndEconomyEnvironment.name,
+            MoralUniform.name,
             os.path.join(
                 this_file_dir, "../foundation/scenarios/covid19/covid19_build.cu"
             ),
         )
         env_wrapper = FoundationEnvWrapper(
-            CovidAndEconomyEnvironment(**run_config["env"]),
+            MoralUniform(**run_config["env"]),
             num_envs=num_envs,
             use_cuda=True,
             customized_env_registrar=env_registry,

@@ -195,13 +195,14 @@ class FoundationEnvWrapper:
                 num_agents=int(self.cuda_data_manager.meta_info("n_agents")),
                 num_envs=int(self.cuda_data_manager.meta_info("n_envs")),
             )
+            print("compile_and_load_cuda...")
             self.cuda_function_manager.compile_and_load_cuda(
                 env_name=self.name,
                 template_header_file="template_env_config.h",
                 template_runner_file="template_env_runner.cu",
                 customized_env_registrar=customized_env_registrar,
             )
-
+            print("initialize_functions...")
             # Register the CUDA step() function for the env
             # Note: generate_observation() is a part of the step function itself
             step_function = f"Cuda{self.name}Step"

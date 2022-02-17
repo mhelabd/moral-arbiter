@@ -1,0 +1,40 @@
+{
+    "scenario_name": "moral_uniform/simple_wood_and_stone",
+    "moral_theory": "", 
+    "agent_morality": "", 
+    "components": [
+      {"Build": {
+            "skill_dist":                   "pareto", 
+            "payment_max_skill_multiplier": 3,
+            "build_labor":                  10,
+            "payment":                      10
+      }},
+      {"ContinuousDoubleAuction": {
+            "max_bid_ask":    10,
+            "order_labor":    0.25,
+            "max_num_orders": 5,
+            "order_duration": 50
+      }},
+      {"Gather": {
+            "move_labor":    1,
+            "collect_labor": 1,
+            "skill_dist":    "pareto"
+      }},
+      {"Steal": {
+            "steal_labor":    1,
+            "skill_dist":    "pareto"  
+      }}
+    ],
+ 
+    "starting_agent_coin": 10,
+    "n_agents": 4,       
+    "world_size": [25, 25], 
+    "episode_length": 1000, 
+  	"multi_action_mode_agents": false,
+    "multi_action_mode_planner": true,
+
+    "flatten_observations": true,
+    "flatten_masks": true,
+    
+    "dense_log_frequency": 1
+}
