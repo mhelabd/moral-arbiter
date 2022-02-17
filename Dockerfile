@@ -23,6 +23,8 @@ RUN conda install -c anaconda -y pip
 RUN pip install ai-economist
 RUN pip install rl_warp_drive
 RUN apt-get update && apt-get install -y git
-RUN git clone https://github.com/mhelabd/ai-ethicist.git
+ARG commit
+RUN echo "$commit" && git clone https://github.com/mhelabd/ai-ethicist.git
+# RUN cd ai-ethicist && git checkout $commit
 RUN echo "PWD is: $PWD"
-CMD [ "python", "./ai-ethicist/ai_economist/training/training_script.py", "./ai-ethicist/ai_economist/training/run_configs/covid_and_economy_environment.yaml " ] 
+CMD [ "python", "./ai-ethicist/ai_economist/training/training_script.py", "--env", "./ai-ethicist/ai_economist/training/run_configs/moral_environment.yaml " ] 
