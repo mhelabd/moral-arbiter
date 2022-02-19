@@ -13,7 +13,7 @@ try:
     print(f"Inside moral_training_script.py: {num_gpus_available} GPUs are available.")
     import yaml
     from ray.rllib.agents.ppo import PPOTrainer
-    from ray.rllib.env_wrapper import RLlibEnvWrapper
+    from rllib.env_wrapper import RLlibEnvWrapper
 except ValueError:
     raise ValueError("This training script needs a GPU to run!") from None
 
