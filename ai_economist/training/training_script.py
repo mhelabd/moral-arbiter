@@ -43,8 +43,7 @@ pytorch_cuda_nit_success = torch.cuda.FloatTensor(8)
 MORAL_ECONOMY = "moral_economy"
 SIMPLE_WOOD_AND_STONE = "simple_wood_and_stone"
 # Usage:
-# >> python ai_economist/training/example_training_script.py
-# --env covid_and_economy_environment
+# >> python ai_economist/training/training_script.py --env simple_wood_and_stone
 
 
 if __name__ == "__main__":
