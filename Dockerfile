@@ -23,7 +23,7 @@ RUN conda install -c anaconda -y pip
 RUN pip install ai-economist
 RUN pip install gym==0.21
 RUN pip install tensorflow==1.14
-RUN pip install "ray[rllib]==0.8.4"
+RUN pip install -U "ray[rllib]"
 RUN pip install rl-warp-drive==1.2.1
 RUN apt-get update && apt-get install -y git
 ARG commit
