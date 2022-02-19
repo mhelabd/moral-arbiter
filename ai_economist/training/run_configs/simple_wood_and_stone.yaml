@@ -6,7 +6,7 @@
 #
 # YAML configuration for the tag continuous environment
 name: "simple_wood_and_stone"
-scenario_name: 'uniform/simple_wood_and_stone',
+scenario_name: 'uniform/simple_wood_and_stone'
 # Environment settings
 env:
   components:
