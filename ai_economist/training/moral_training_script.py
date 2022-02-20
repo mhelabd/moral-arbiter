@@ -4,8 +4,7 @@
 import argparse
 import os
 import GPUtil
-
-from ai_economist.foundation.scenarios import simple_wood_and_stone
+import ray
 
 try:
     num_gpus_available = len(GPUtil.getAvailable())
@@ -44,7 +43,9 @@ if __name__ == "__main__":
     with open(config_path, "r", encoding="utf8") as f:
         run_config = yaml.safe_load(f)
 
-    env_obj = RLlibEnvWrapper({"env_config_dict": run_config}, verbose=True)
+    ray.init(webui_host="127.0.0.1")
+
+    env_obj = RLlibEnvWrapper({"env_config_dict": run_config['env']}, verbose=True)
 
     # POLICIES
     policies = {
@@ -62,7 +63,7 @@ if __name__ == "__main__":
         )
     }
     policy_mapping_fun = lambda i: "a" if str(i).isdigit() else "p"
-    policies_to_train = ["a", "p"]
+    policies_to_train = ["a"]
 
     trainer_config = {
         "multiagent": {
@@ -70,17 +71,13 @@ if __name__ == "__main__":
             "policies_to_train": policies_to_train,
             "policy_mapping_fn": policy_mapping_fun,
         }, 
-        "num_workers": 16,
-        "num_envs_per_worker": 4,
-        # Other training parameters
-        "train_batch_size":  4000,
-        "sgd_minibatch_size": 4000,
-        "num_sgd_iter": 1000,
         "env_config": { 
-            "env_config_dict": run_config,
-            "num_envs_per_worker": 4,   
+            "env_config_dict": run_config['env'],
+            "num_envs_per_worker": run_config['trainer']['num_envs_per_worker'],   
         }
     }
+    trainer_config.update(run_config['trainer'])
+
     trainer = PPOTrainer(
         env=RLlibEnvWrapper,
         config=trainer_config,
