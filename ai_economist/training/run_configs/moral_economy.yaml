@@ -5,7 +5,6 @@
 # or https://opensource.org/licenses/BSD-3-Clause
 #
 # YAML configuration for the tag continuous environment
-name: "moral_economy"
 scenario_name: 'moral_uniform/simple_wood_and_stone'
 # Environment settings
 env:
