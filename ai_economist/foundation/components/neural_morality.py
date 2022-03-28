@@ -33,8 +33,8 @@ class NeuralMorality(BaseComponent):
 
     name = "NeuralMorality"
     component_type = "NeuralMorality"
-    required_entities = ["Wood", "Stone", "Coin", "build_skill", "bonus_steal_prob", "Labor"]
-    agent_subclasses = ["BasicMobileAgent", "BasicPlanner"]
+    required_entities = ["Wood", "Stone", "Coin", "Labor"]
+    agent_subclasses = ["BasicPlanner"]
 
     def __init__(
         self,
@@ -45,7 +45,7 @@ class NeuralMorality(BaseComponent):
         top_moral_value=10,
         n_buckets=10,
         bucket_spacing="log",
-        states=['Coin', 'Wood', 'Stone', 'Labor'], #TODO add looking at the map
+        states=['Coin', 'Wood', 'Stone', 'Labor'], #TODO add looking at the map and skill
         **base_component_kwargs
     ):
         super().__init__(*base_component_args, **base_component_kwargs)
@@ -129,7 +129,7 @@ class NeuralMorality(BaseComponent):
                 # For every state, the planner can select one of the discretized
                 # moral rates.
                 return [
-                    ("moralityof_{:03d}".format(state), self.n_buckets)
+                    ("moralityof_{}".format(state), self.n_buckets)
                     for state in self.states
                 ]
 
@@ -157,6 +157,18 @@ class NeuralMorality(BaseComponent):
 
         # increment timestep.
         self.curr_cycle_pos += 1
+
+    def get_additional_state_fields(self, agent_cls_name):
+        """
+        See base_component.py for detailed description.
+
+        For planner agents, add state fields for the moral values.
+        """
+        if agent_cls_name not in self.agent_subclasses:
+            return {}
+        if agent_cls_name == "BasicPlanner":
+            return {"curr_moral_values": {state: self.curr_moral_values[i] for i, state in enumerate(self.states)}}
+        raise NotImplementedError
 
     def generate_observations(self):
         """

@@ -12,6 +12,7 @@ from . import (
     covid19_components,
     move,
     redistribution,
+    neural_morality,
     simple_labor,
     steal,
 )
