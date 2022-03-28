@@ -36,12 +36,11 @@ env:
 # Trainer settings
 trainer:
     train_batch_size: 5400 # total batch size used for training per iteration (across all the environments)
-    num_workers: 16
+    num_workers: 4
     num_envs_per_worker: 4
     # Other training parameters
-    train_batch_size:  4000
-    sgd_minibatch_size: 4000
-    num_sgd_iter: 1000
+    sgd_minibatch_size: 100
+    num_sgd_iter: 100
 # Policy network settings
 policy: # list all the policies below
     a:

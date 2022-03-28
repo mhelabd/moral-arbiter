@@ -61,7 +61,7 @@ class Build(BaseComponent):
         assert self.build_labor >= 0
 
         self.skill_dist = skill_dist.lower()
-        assert self.skill_dist in ["none", "pareto", "lognormal"]
+        assert self.skill_dist in ["none", "pareto", "lognormal", "predefined"]
 
         self.sampled_skills = {}
 
@@ -243,6 +243,10 @@ class Build(BaseComponent):
             elif self.skill_dist == "lognormal":
                 sampled_skill = np.random.lognormal(-1, 0.5)
                 pay_rate = np.minimum(PMSM, (PMSM - 1) * sampled_skill + 1)
+            elif self.skill_dist == "predefined":
+                # Pay is 11.3, 13.3, 16.5, and 22.2
+                sampled_skill = [0.065, 0.165, 0.325, 0.61][agent.idx]
+                pay_rate = np.minimum(PMSM, (PMSM - 1) * sampled_skill + 1)                
             else:
                 raise NotImplementedError
 

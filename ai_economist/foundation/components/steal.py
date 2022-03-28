@@ -175,7 +175,7 @@ class Steal(BaseComponent):
                 bonus_rate = np.minimum(2, np.random.lognormal(-2.022, 0.938)) / 2
             else:
                 raise NotImplementedError
-            agent.state["bonus_steals_prob"] = float(bonus_rate)
+            agent.state["bonus_steal_prob"] = float(bonus_rate)
 
         self.steals = []
 

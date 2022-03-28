@@ -14,6 +14,7 @@ import ray
 from utils import remote, saving
 import tf_models
 import yaml
+import ai_economist.training.plots as plots
 from env_wrapper import RLlibEnvWrapper
 from ray.rllib.agents.ppo import PPOTrainer
 from ray.tune.logger import NoopLogger, pretty_print
@@ -116,7 +117,7 @@ def build_trainer(run_configuration):
         return NoopLogger({}, "/tmp")
 
     ppo_trainer = PPOTrainer(
-        env=RLlibEnvWrapper, config=trainer_config, logger_creator=logger_creator
+        env=RLlibEnvWrapper, config=trainer_config,
     )
 
     return ppo_trainer
@@ -236,7 +237,12 @@ def maybe_store_dense_log(
                 os.makedirs(log_dir)
             saving.write_dense_logs(trainer_obj, log_dir)
             logger.info(">> Wrote dense logs to: %s", log_dir)
-
+            env = trainer.workers.local_worker().env
+            original_stdout = sys.stdout
+            log_file = open(log_dir + "/logfile.txt", "w+")
+            sys.stdout = log_file
+            plots.play_random_episode(trainer_obj, env, plot_every=20, do_dense_logging=True, basedir=log_dir)
+            sys.stdout = original_stdout
 
 def maybe_save(trainer_obj, result_dict, ckpt_freq, ckpt_directory, trainer_step_last_ckpt):
     global_step = result_dict["timesteps_total"]

@@ -58,6 +58,11 @@ class LayoutFromFile(BaseEnvironment):
         mixing_weight_gini_vs_coin (float): Degree to which equality is ignored w/
             "coin_eq_times_productivity". Default is 0, which weights equality and
             productivity equally. If set to 1, only productivity is rewarded.
+        moral_theory: (str): The type of moral theory for the agents to use. Options 
+            are "amoral", "utilitarian", "virtue ethics", "AI"
+        agent_morality (float, list): The measure of morality of an agent. If one 
+            number, then all agents have the same morality. If list of len(agents), 
+            then each agent takes the morality of their index. 
     """
 
     name = "moral_layout_from_file/simple_wood_and_stone"
@@ -80,6 +85,8 @@ class LayoutFromFile(BaseEnvironment):
         energy_warmup_method="decay",
         planner_reward_type="coin_eq_times_productivity",
         mixing_weight_gini_vs_coin=0.0,
+        moral_theory="amoral",
+        agent_morality=0,
         **base_env_kwargs,
     ):
         super().__init__(*base_env_args, **base_env_kwargs)
@@ -91,6 +98,13 @@ class LayoutFromFile(BaseEnvironment):
         self._full_observability = bool(full_observability)
 
         self._mobile_agent_observation_range = int(mobile_agent_observation_range)
+
+        self._moral_theory = moral_theory
+        if type(agent_morality) == list:
+            assert len(agent_morality) == len(self.world.agents)
+        else:
+            agent_morality = [agent_morality]*len(self.world.agents)
+        self._agent_morality = agent_morality
 
         # Load in the layout
         path_to_layout_file = (
@@ -266,7 +280,7 @@ class LayoutFromFile(BaseEnvironment):
 
         raise NotImplementedError
 
-    def get_current_optimization_metrics(self):
+    def get_current_optimization_metrics(self,  isoelastic_eta=0.23, labor_exponent=2.0, labor_coefficient=0.1):
         """
         Compute optimization metrics based on the current state. Used to compute reward.
 
@@ -276,13 +290,60 @@ class LayoutFromFile(BaseEnvironment):
         """
         curr_optimization_metric = {}
         # (for agents)
-        for agent in self.world.agents:
-            curr_optimization_metric[agent.idx] = rewards.isoelastic_coin_minus_labor(
-                coin_endowment=agent.total_endowment("Coin"),
-                total_labor=agent.state["endogenous"]["Labor"],
-                isoelastic_eta=self.isoelastic_eta,
-                labor_coefficient=self.energy_weight * self.energy_cost,
-            )
+        if self._moral_theory == "amoral":
+            for agent in self.world.agents:
+                curr_optimization_metric[agent.idx] = rewards.isoelastic_coin_minus_labor(
+                    coin_endowment=agent.total_endowment("Coin"),
+                    total_labor=agent.state["endogenous"]["Labor"],
+                    isoelastic_eta=isoelastic_eta,
+                    labor_coefficient=labor_coefficient,
+                )
+        elif self._moral_theory == "utilitarian":
+            for agent in self.world.agents:
+                curr_optimization_metric[agent.idx] = rewards.utilitarian_isoelastic_coin_minus_labor(
+                    coin_endowment=agent.total_endowment("Coin"),
+                    total_labor=agent.state["endogenous"]["Labor"],
+                    labor_coefficient=labor_coefficient,
+                    isoelastic_eta=isoelastic_eta,
+                    coin_endowments=np.array(
+                    [agent.total_endowment("Coin") for agent in self.world.agents]
+                    ),
+                    utilitarian_coefficient=self._agent_morality[agent.idx] / len(self.world.agents)
+                ) 
+        elif self._moral_theory == "virtue_ethics":
+            for agent in self.world.agents:
+                curr_optimization_metric[agent.idx] = rewards.virtue_ethics_isoelastic_coin_minus_labor(
+                    coin_endowment=agent.total_endowment("Coin"),
+                    total_labor=agent.state["endogenous"]["Labor"],
+                    labor_coefficient=labor_coefficient,
+                    isoelastic_eta=isoelastic_eta,
+                    is_moral_action=agent.get_component_action("Steal") == 0,
+                    virtue_ethics_coefficient=self._agent_morality[agent.idx]
+                )
+        elif self._moral_theory == "AI":
+            for agent in self.world.agents:
+                curr_optimization_metric[agent.idx] = rewards.learned_reward(
+                    planner=self.world.planner,
+                    coin_endowments=np.array( 
+                        [agent.total_endowment("Coin")] +  [a.total_endowment("Coin") for a in self.world.agents if a.idx != agent.idx]
+                    ),
+                    labors=np.array( 
+                        [agent.state["endogenous"]["Labor"]] +  [a.state["endogenous"]["Labor"] for a in self.world.agents if a.idx != agent.idx]
+                    ),
+                    stone_endowments=np.array( 
+                        [agent.total_endowment("Stone")] +  [a.total_endowment("Stone") for a in self.world.agents if a.idx != agent.idx]
+                    ),
+                    wood_endowments=np.array( 
+                        [agent.total_endowment("Wood")] +  [a.total_endowment("Wood") for a in self.world.agents if a.idx != agent.idx]
+                    ),
+                    labor_coefficient=labor_coefficient,
+                    isoelastic_eta=isoelastic_eta,
+                    moral_coeffecient=self._agent_morality[agent.idx]
+                )
+        else:
+            print("No valid agent reward selected!")
+            raise NotImplementedError
+
         # (for the planner)
         if self.planner_reward_type == "coin_eq_times_productivity":
             curr_optimization_metric[

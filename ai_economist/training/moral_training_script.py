@@ -5,6 +5,9 @@ import argparse
 import os
 import GPUtil
 import ray
+import plots
+import sys
+original_stdout = sys.stdout 
 
 try:
     num_gpus_available = len(GPUtil.getAvailable())
@@ -24,6 +27,7 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser()
     parser.add_argument("--env", "-e", type=str, help="Environment to train.")
+    parser.add_argument("--morality", "-m", type=str, help="Moral Framework")
 
     args = parser.parse_args()
 
@@ -38,12 +42,17 @@ if __name__ == "__main__":
     config_path = os.path.join(
         os.path.dirname(os.path.abspath(__file__)),
         "run_configs",
-        f"{args.env}.yaml",
+        f"{args.morality}.yaml",
     )
     with open(config_path, "r", encoding="utf8") as f:
         run_config = yaml.safe_load(f)
 
-    ray.init(webui_host="127.0.0.1")
+    saving_config = run_config['saving']
+    os.makedirs(saving_config['basedir'] + saving_config['name'], exist_ok=True)
+    log_file = open(saving_config['basedir'] + saving_config['name'] + "/logfile.txt", "w+")
+    sys.stdout = log_file
+
+    ray.init()
 
     env_obj = RLlibEnvWrapper({"env_config_dict": run_config['env']}, verbose=True)
 
@@ -83,5 +92,20 @@ if __name__ == "__main__":
         config=trainer_config,
     )
 
-    trainer.train()
-    trainer.graceful_close()
+    NUM_ITERS = 5000
+    for i in range(NUM_ITERS):
+        print(f'********** Iter : {i} **********')
+        result = trainer.train()
+        print(f'''episode_reward_mean: {result.get('episode_reward_mean')}''')
+        if i % saving_config['model_params_save_freq'] == 0 or i==NUM_ITERS-1:
+            checkpoint = trainer.save(saving_config['basedir'] + saving_config['name'] + '/weights/')
+            checkpoint = checkpoint[:checkpoint.rfind('/')+1]
+            statsdir = checkpoint.replace('weights', 'stats')
+            os.makedirs(statsdir, exist_ok=True)
+            with open(statsdir + 'stats.txt', 'w+') as f:
+                sys.stdout = f
+                plots.play_random_episode(trainer, env_obj, do_dense_logging=True, basedir=statsdir)
+            sys.stdout = log_file
+            print("checkpoint saved at", checkpoint)
+    ray.shutdown()
+    log_file.close()

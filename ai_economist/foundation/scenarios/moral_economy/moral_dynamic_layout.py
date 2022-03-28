@@ -268,19 +268,19 @@ class MoralUniform(BaseEnvironment):
         # (for agents)
         if self._moral_theory == "amoral":
             for agent in self.world.agents:
-                curr_optimization_metric[agent.idx] = rewards.coin_minus_labor_cost(
+                curr_optimization_metric[agent.idx] = rewards.isoelastic_coin_minus_labor(
                     coin_endowment=agent.total_endowment("Coin"),
                     total_labor=agent.state["endogenous"]["Labor"],
-                    labor_exponent=labor_exponent,
+                    isoelastic_eta=isoelastic_eta,
                     labor_coefficient=labor_coefficient,
                 )
         elif self._moral_theory == "utilitarian":
             for agent in self.world.agents:
-                curr_optimization_metric[agent.idx] = rewards.utilitarian_coin_minus_labor_cost(
+                curr_optimization_metric[agent.idx] = rewards.utilitarian_isoelastic_coin_minus_labor(
                     coin_endowment=agent.total_endowment("Coin"),
                     total_labor=agent.state["endogenous"]["Labor"],
-                    labor_exponent=labor_exponent,
                     labor_coefficient=labor_coefficient,
+                    isoelastic_eta=isoelastic_eta,
                     coin_endowments=np.array(
                     [agent.total_endowment("Coin") for agent in self.world.agents]
                     ),
@@ -288,11 +288,11 @@ class MoralUniform(BaseEnvironment):
                 ) 
         elif self._moral_theory == "virtue_ethics":
             for agent in self.world.agents:
-                curr_optimization_metric[agent.idx] = rewards.virtue_ethics_coin_minus_labor_cost(
+                curr_optimization_metric[agent.idx] = rewards.virtue_ethics_isoelastic_coin_minus_labor(
                     coin_endowment=agent.total_endowment("Coin"),
                     total_labor=agent.state["endogenous"]["Labor"],
-                    labor_exponent=labor_exponent,
                     labor_coefficient=labor_coefficient,
+                    isoelastic_eta=isoelastic_eta,
                     is_moral_action=agent.get_component_action("Steal") == 0,
                     virtue_ethics_coefficient=self._agent_morality[agent.idx]
                 )

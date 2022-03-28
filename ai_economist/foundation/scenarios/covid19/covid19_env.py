@@ -16,7 +16,6 @@ from ai_economist.foundation.utils import verify_activation_code
 
 try:
     num_gpus_available = len(GPUtil.getAvailable())
-    print(f"Inside covid19_env.py: {num_gpus_available} GPUs are available.")
     if num_gpus_available == 0:
         print("No GPUs found! Running the simulation on a CPU.")
     else:
