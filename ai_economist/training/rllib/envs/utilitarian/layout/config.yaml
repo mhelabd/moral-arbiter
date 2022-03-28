@@ -41,7 +41,7 @@ env:
   scenario_name: moral_layout_from_file/simple_wood_and_stone
   moral_theory: 'utilitarian'
   agent_morality: 1
-  starting_agent_coin: 0
+  starting_agent_coin: 0 # TODO: ,starting coins can be 10
   world_size:
   - 25
   - 25
