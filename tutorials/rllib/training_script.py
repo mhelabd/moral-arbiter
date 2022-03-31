@@ -227,7 +227,7 @@ def maybe_store_dense_log(
         episodes_per_replica = (
             result_dict["episodes_total"] // result_dict["episodes_this_iter"]
         )
-        if episodes_per_replica == 1 or (episodes_per_replica % dense_log_freq) == 0:
+        if (episodes_per_replica % dense_log_freq) == 0: # or episodes_per_replica == 1 
             log_dir = os.path.join(
                 dense_log_directory,
                 "logs_{:016d}".format(result_dict["timesteps_total"]),

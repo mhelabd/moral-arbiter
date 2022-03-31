@@ -23,7 +23,7 @@ env:
   - Steal:
       steal_labor: 1
       skill_dist: pareto
-  dense_log_frequency: 20
+  dense_log_frequency: 5000
   energy_cost: 0.21
   energy_warmup_constant: 10000
   energy_warmup_method: auto
@@ -41,15 +41,15 @@ env:
   scenario_name: moral_layout_from_file/simple_wood_and_stone
   moral_theory: 'virtue_ethics'
   agent_morality: 100
-  starting_agent_coin: 0
+  starting_agent_coin: 10
   world_size:
   - 25
   - 25
 general:
   ckpt_frequency_steps: 750000
-  cpus: 4
+  cpus: 12
   episodes: 25000
-  gpus: 1
+  gpus: 3
   restore_tf_weights_agents: ''
   restore_tf_weights_planner: ''
   train_planner: false
@@ -106,23 +106,23 @@ trainer:
   metrics_smoothing_episodes: null
   multiagent: null
   no_done_at_end: false
-  num_envs_per_worker: 2
+  num_envs_per_worker: 8
   num_gpus: 1
-  num_gpus_per_worker: 0.5
   num_sgd_iter: 1
-  num_workers: 4
+  num_workers: 6
   observation_filter: NoFilter
   rollout_fragment_length: 200
-  seed: null
+  seed: 1024
   sgd_minibatch_size: 1500
   shuffle_sequences: true
   tf_session_args:
     allow_soft_placement: true
     device_count:
-      CPU: 4
+      CPU: 6
       GPU: 1
     gpu_options:
       allow_growth: true
+      visible_device_list: '1'
     inter_op_parallelism_threads: 2
     intra_op_parallelism_threads: 24
     log_device_placement: false

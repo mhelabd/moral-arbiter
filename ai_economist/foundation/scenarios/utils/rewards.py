@@ -297,15 +297,17 @@ def virtue_ethics_isoelastic_coin_minus_labor(
 
     return util
 
-def learned_reward(planner, coin_endowments, labors, stone_endowments, wood_endowments, labor_coefficient, isoelastic_eta, moral_coeffecient):
+def learned_reward(planner, coin_endowments, labors, stone_endowments, wood_endowments, num_houses, labor_coefficient, isoelastic_eta, moral_coeffecient):
     """Agent utility, concave increasing in learned utility, linearly decreasing 
     with labor.
 
     Args:
+        planner: The planner agent
         coin_endowment (float, ndarray): The amount of coin owned by the agent(s).
         labors (float, ndarray): The amount of labor done by the agent(s).
         stone_endowments (float, ndarray): The amount of stones earned by the agent(s).
         wood_endowments (float, ndarray): The amount of woods earned by the agent(s).
+        num_houses (int, ndarray): The number of houses owned by the agent(s).
         labor_coefficient (float): Constant describing the disutility experienced per
             unit of labor performed. Disutility from labor equals:
                 labor_coefficient * total_labor
@@ -325,7 +327,7 @@ def learned_reward(planner, coin_endowments, labors, stone_endowments, wood_endo
     # world.planner.get_state_multiplier
     assert np.all(coin_endowment >= 0)
     assert 0 <= isoelastic_eta <= 1.0
-    learned_utility = social_metrics.learned_utility(planner, coin_endowments, labors, stone_endowments, wood_endowments)
+    learned_utility = social_metrics.learned_utility(planner, coin_endowments, labors, stone_endowments, wood_endowments, num_houses)
     # how much to value my own coin endowment versus the learned utility
     util_c = (1 -  moral_coeffecient) * coin_endowment + moral_coeffecient * learned_utility
 

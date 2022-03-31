@@ -5,6 +5,6 @@ do
     while ! tail -1 ${config_file}/logfile.txt | grep "Final snapshot saved! All done." > /dev/null;
     do
         echo "working..."
-        sleep 10000;
+        sleep 120;
     done
 done

@@ -39,7 +39,7 @@ def do_plot(env, ax, fig, i, basedir):
     plotting.plot_env_state(env, ax)
     ax.set_aspect('equal')
     if basedir:
-        fig.savefig(f'{basedir}/{i}.png')
+        fig.savefig(f'{basedir}/{i}.png') # TODO fix plotting
     plt.cla()
 
 
@@ -70,23 +70,18 @@ def play_random_episode(
         actions = {}
         for agent_idx in range(env_obj.env.n_agents):
             # Use the trainer object directly to sample actions for each agent
-            action, state, logits = trainer.compute_action(
-                obs[str(agent_idx)],
-                agent_states[str(agent_idx)],
-                policy_id="a",
-                full_fetch=False
+            actions[str(agent_idx)], _, _ = trainer.compute_action(
+                obs[str(agent_idx)], 
+                agent_states[str(agent_idx)], 
+                policy_id='a',
             )
 
         # Action sampling for the planner
-        action = trainer.compute_action(
-            obs['p'],
-            planner_states,
-            policy_id="p",
-            full_fetch=False
+        actions["p"] = trainer.compute_action(
+            obs['p'], 
+            planner_states, 
+            policy_id='p',
         )
-        actions['p'] = action
-
-        # actions["p"] = np.argmax(actions["p"]['behaviour_logits'])
 
         obs, rew, done, info = env_obj.step(actions)
 

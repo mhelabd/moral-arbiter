@@ -33,7 +33,7 @@ class NeuralMorality(BaseComponent):
 
     name = "NeuralMorality"
     component_type = "NeuralMorality"
-    required_entities = ["Wood", "Stone", "Coin", "Labor"]
+    required_entities = ["Wood", "Stone", "Coin", "Labor", "House"]
     agent_subclasses = ["BasicPlanner"]
 
     def __init__(
@@ -45,14 +45,12 @@ class NeuralMorality(BaseComponent):
         top_moral_value=10,
         n_buckets=10,
         bucket_spacing="log",
-        states=['Coin', 'Wood', 'Stone', 'Labor'], #TODO add looking at the map and skill
+        states=['Coin', 'Wood', 'Stone', 'Labor', 'House'], #TODO add looking at the map and skill
         **base_component_kwargs
     ):
         super().__init__(*base_component_args, **base_component_kwargs)
 
-        # Whether to turn off taxes. Disabling taxes will prevent any taxes from
-        # being collected but the observation space will be the same as if taxes were
-        # enabled, which can be useful for controlled tax/no-tax comparisons.
+        # Whether to turn off morality
         self.disable_morality = bool(disable_morality)
         self.bottom_moral_value = bottom_moral_value
         self.top_moral_value = top_moral_value
@@ -136,10 +134,6 @@ class NeuralMorality(BaseComponent):
         # Return 0 (no added actions) if the other conditions aren't met.
         return 0
 
-    def get_additional_state_fields(self, agent_cls_name):
-        """This component does not add any agent state fields."""
-        return {}
-
     def component_step(self):
         """
         See base_component.py for detailed description.
@@ -165,7 +159,7 @@ class NeuralMorality(BaseComponent):
         For planner agents, add state fields for the moral values.
         """
         if agent_cls_name not in self.agent_subclasses:
-            return {}
+            return {"curr_moral_values": {state: self.curr_moral_values[i] for i, state in enumerate(self.states)}}            
         if agent_cls_name == "BasicPlanner":
             return {"curr_moral_values": {state: self.curr_moral_values[i] for i, state in enumerate(self.states)}}
         raise NotImplementedError
@@ -197,10 +191,12 @@ class NeuralMorality(BaseComponent):
             k = str(i)
             agent_states = {}
             for state in self.state_types:
-              if state == "Coin" or state == "Wood" or state == "Stone":
+              if state in ["Coin", "Wood", "Stone"]:
                 agent_states[state] = agent.state["inventory"][state]
               elif state == "Labor":
                 agent_states[state] = agent.state["endogenous"][state]
+              elif state == "House":
+                  agent_states[state] = np.sum(np.array(self.world.maps.get(state)["owner"]) == i)
               else:
                 agent_states[state] = agent.state[state]
 
@@ -241,7 +237,7 @@ class NeuralMorality(BaseComponent):
         # No need to recompute. Use the cached masks.
         masks = dict()
         if self.curr_cycle_pos != 1 or self.disable_morality:
-            # Apply zero masks for any timestep where taxes
+            # Apply zero masks for any timestep where moral law
             # are not going to be updated.
             masks[self.world.planner.idx] = self._planner_masks["zeros"]
         else:
