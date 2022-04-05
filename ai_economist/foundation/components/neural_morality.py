@@ -11,7 +11,7 @@ from ai_economist.foundation.base.base_component import (
 @component_registry.add
 class NeuralMorality(BaseComponent):
     """Defines agent Morality
-
+        TODO: Action masking
     Note:
         If this component is used, it should always be the last component in the order!
 
