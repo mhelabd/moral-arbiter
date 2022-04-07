@@ -23,7 +23,7 @@ RUN conda install -c anaconda -y pip
 RUN pip install ai-economist
 RUN pip install gym==0.21
 RUN pip install tensorflow==1.14
-RUN pip install -U "ray[rllib]"
+RUN pip install -U "ray[rllib]"==0.8.4
 ARG commit
 # RUN echo "$commit" && git clone https://github.com/mhelabd/ai-ethicist.git
 RUN echo "$commit"
