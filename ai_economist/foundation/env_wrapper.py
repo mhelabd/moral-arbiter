@@ -14,7 +14,8 @@ try:
     num_gpus_available = len(GPUtil.getAvailable())
     print(f"Inside env_wrapper.py: {num_gpus_available} GPUs are available.")
     if num_gpus_available == 0:
-        print("No GPUs found! Running the simulation on a CPU.")
+        # print("No GPUs found! Running the simulation on a CPU.")
+        num_gpus_available = 0
     else:
         from warp_drive.managers.data_manager import CUDADataManager
         from warp_drive.managers.function_manager import (
@@ -28,7 +29,8 @@ except ModuleNotFoundError:
         "'pip install rl-warp-drive' first."
     )
 except ValueError:
-    print("No GPUs found! Running the simulation on a CPU.")
+    # print("No GPUs found! Running the simulation on a CPU.")
+    num_gpus_available = 0
 
 import numpy as np
 from gym.spaces import Box, Dict, Discrete, MultiDiscrete

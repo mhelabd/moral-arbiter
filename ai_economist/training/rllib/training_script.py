@@ -95,10 +95,11 @@ def build_trainer(run_configuration):
         return "p"
 
     # Which policies to train
-    if run_configuration["general"]["train_planner"]:
-        policies_to_train = ["a", "p"]
-    else:
-        policies_to_train = ["a"]
+    policies_to_train = []
+    if run_configuration["general"].get("train_planner", False):
+        policies_to_train.append("p")
+    if run_configuration["general"].get("train_agent", True):
+        policies_to_train.append("a")
 
     # === Finalize and create ===
     trainer_config.update(

@@ -36,7 +36,9 @@ def make_env(
 		# run_configuration['env']['components'][0]['Build']['skill_dist'] = 'predefined'
 		run_configuration['general']['episodes'] = 1 # No need for training
 		run_configuration['env']['dense_log_frequency'] = 1
-		run_configuration['general']['restore_tf_weights_agents'] = os.path.join('/home/mhelabd/ai-ethicist', new_path, 'ckpts/agent.tf.weights.global-step-25008000')
+		run_configuration['general']['train_planner'] = False
+		run_configuration['general']['train_agent'] = False
+		run_configuration['general']['restore_tf_weights_agents'] = os.path.join('/home/mhelabd/ai-ethicist', new_path, 'ckpts/agent.tf.weights.global-step-25024000')
 		new_path = os.path.join(new_path, 'predefined_skill')
 
 	os.makedirs(new_path, exist_ok=True)

@@ -17,7 +17,8 @@ from ai_economist.foundation.utils import verify_activation_code
 try:
     num_gpus_available = len(GPUtil.getAvailable())
     if num_gpus_available == 0:
-        print("No GPUs found! Running the simulation on a CPU.")
+        # print("No GPUs found! Running the simulation on a CPU.")
+        num_gpus_available = 0
     else:
         from warp_drive.utils.constants import Constants
         from warp_drive.utils.data_feed import DataFeed
@@ -32,7 +33,8 @@ except ModuleNotFoundError:
         "'pip install rl-warp-drive' first."
     )
 except ValueError:
-    print("No GPUs found! Running the simulation on a CPU.")
+    # print("No GPUs found! Running the simulation on a CPU.")
+    num_gpus_available = 0
 
 
 @scenario_registry.add
