@@ -143,7 +143,7 @@ class NeuralMorality(BaseComponent):
 
         # 1. On the first day of a new moral rate: Set up the rewards for this period.
         if self.curr_cycle_pos == 1:
-          self.set_new_period_rates_model()
+          self.set_new_period_moral_code()
 
         # 2. On the last day of the moral period, return to first position.
         if self.curr_cycle_pos >= self.period:
@@ -196,7 +196,7 @@ class NeuralMorality(BaseComponent):
               elif state == "Labor":
                 agent_states[state] = agent.state["endogenous"][state]
               elif state == "House":
-                  agent_states[state] = np.sum(np.array(self.world.maps.get(state)["owner"]) == i)
+                  agent_states[state] = np.sum(np.array(self.world.maps.get(state, owner=True)) == i)
               else:
                 agent_states[state] = agent.state[state]
 

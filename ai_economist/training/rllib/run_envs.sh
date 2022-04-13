@@ -17,3 +17,12 @@ select yn in "Yes" "No"; do
   esac
   break;
 done
+
+echo "AI?"
+select yn in "Yes" "No"; do
+  case $yn in
+    Yes ) bash ./envs/AI/layout/run_envs.sh;;
+    No ) exit;;
+  esac
+  break;
+done

@@ -23,7 +23,20 @@ env:
   - Steal:
       steal_labor: 1
       skill_dist: pareto
-  dense_log_frequency: 20
+  - NeuralMorality:
+      disable_morality: false
+      period: 10
+      bottom_moral_value: -10
+      top_moral_value: 10
+      n_buckets: 10
+      bucket_spacing: log
+      states:
+      - Coin
+      - Wood
+      - Stone
+      - Labor
+      - House
+  dense_log_frequency: 20000
   energy_cost: 0.21
   energy_warmup_constant: 10000
   energy_warmup_method: auto
@@ -40,15 +53,15 @@ env:
   planner_reward_type: coin_eq_times_productivity
   scenario_name: moral_layout_from_file/simple_wood_and_stone
   moral_theory: 'utilitarian'
-  agent_morality: 1
-  starting_agent_coin: 0
+  agent_morality: 0
+  starting_agent_coin: 10
   world_size:
   - 25
   - 25
 general:
-  ckpt_frequency_steps: 750000
-  cpus: 4
-  episodes: 2500
+  ckpt_frequency_steps: 1750000
+  cpus: 12
+  episodes: 25000
   gpus: 1
   restore_tf_weights_agents: ''
   restore_tf_weights_planner: ''
@@ -108,9 +121,9 @@ trainer:
   no_done_at_end: false
   num_envs_per_worker: 2
   num_gpus: 1
-  num_gpus_per_worker: 0.5
+  # num_gpus_per_worker: 0.4
   num_sgd_iter: 1
-  num_workers: 4
+  num_workers: 12
   observation_filter: NoFilter
   rollout_fragment_length: 200
   seed: null
@@ -119,10 +132,11 @@ trainer:
   tf_session_args:
     allow_soft_placement: true
     device_count:
-      CPU: 4
+      CPU: 12
       GPU: 1
     gpu_options:
       allow_growth: true
+      visible_device_list: '1'
     inter_op_parallelism_threads: 2
     intra_op_parallelism_threads: 24
     log_device_placement: false

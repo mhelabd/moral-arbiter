@@ -1,6 +1,17 @@
 cd ~/ai-ethicist/ai_economist/training/rllib/
 
 
+echo "AI?"
+select yn in "Yes_phase1" "Yes_phase2" "No"; do
+  case $yn in
+    Yes_phase1 ) python training_script.py --run-dir envs/AI/layout/phase1/ > envs/AI/layout/phase1/logfile.txt 2>&1&;;
+    Yes_phase2 ) python training_script.py --run-dir envs/AI/layout/phase2/ > envs/AI/layout/phase2/logfile.txt 2>&1&;;
+    No ) exit;;
+  esac
+  break;
+done
+
+
 echo "Amoral?"
 select yn in "Yes_layout" "Yes_rand" "No"; do
   case $yn in

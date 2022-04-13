@@ -337,8 +337,8 @@ class LayoutFromFile(BaseEnvironment):
                         [agent.total_endowment("Wood")] + [a.total_endowment("Wood") for a in self.world.agents if a.idx != agent.idx]
                     ),
                     num_houses=np.array(
-                        [np.sum(np.array(self.world.maps.get("House")["owner"]) ==agent.idx)] +  
-                        [np.sum(np.array(self.world.maps.get("House")["owner"]) ==a.idx) for a in self.world.agents if a.idx != agent.idx]
+                        [np.sum(np.array(self.world.maps.get("House", owner=True)) == agent.idx)] +  
+                        [np.sum(np.array(self.world.maps.get("House", owner=True)) ==a.idx) for a in self.world.agents if a.idx != agent.idx]
                     ),
                     labor_coefficient=labor_coefficient,
                     isoelastic_eta=isoelastic_eta,
