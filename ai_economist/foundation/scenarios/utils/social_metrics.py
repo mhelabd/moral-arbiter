@@ -89,7 +89,5 @@ def total_utility(coin_endowments):
 def learned_utility(planner, coin_endowments, labors, stones, woods, num_houses, n_agents=4):
     planner_states = ['Coin', 'Labor', 'Stone', 'Wood', 'House']
     curr_value = [coin_endowments, labors, stones, woods, num_houses]
-    print(planner.state['curr_moral_values'])
     utility = np.sum([planner.state['curr_moral_values'][planner_states[j] + str(i)] * curr_value[j][i] for i in range(n_agents) for j in range(len(planner_states))])
-    print(utility)
     return utility

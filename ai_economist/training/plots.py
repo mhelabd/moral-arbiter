@@ -8,7 +8,7 @@ from os.path import isfile, join
 import cv2
 
 
-def get_logs(trainer, basedir=None, moral_theory="None", agent_morality=0):
+def get_logs(trainer, env, basedir=None, moral_theory="None", agent_morality=0):
     dense_logs = {}
 
     # Note: worker 0 is reserved for the trainer actor
@@ -19,6 +19,8 @@ def get_logs(trainer, basedir=None, moral_theory="None", agent_morality=0):
                 trainer.workers.foreach_worker(lambda w: w.async_env)[
                 worker].envs[env_id].env.previous_episode_dense_log
     for k, v in dense_logs.items():
+        if v.get('world', []) == []: #TODO: fix this
+            continue
         (fig0, fig1, fig2), incomes, endows, c_trades, all_builds = plotting.breakdown(v)
         if basedir is not None:
             fig0.savefig(f'{basedir}{k}, 0.png')
@@ -30,7 +32,7 @@ def get_logs(trainer, basedir=None, moral_theory="None", agent_morality=0):
         print("Productivity: {}".format(social_metrics.get_productivity(endows)))
         print("Moral Theory: {}".format(moral_theory))
         print("Agent Morality: {}".format(agent_morality))
-
+        # print("Learned Morality: {}".format(env.planner.state.get('curr_moral_values', 'None')))
     return dense_logs
 
 
@@ -92,7 +94,7 @@ def play_random_episode(
     if do_dense_logging:
         logdir = join(basedir, 'denselogs/')
         makedirs(logdir, exist_ok=True)
-        get_logs(trainer, logdir, getattr(env_obj.env, '_moral_theory', "None"), getattr(env_obj.env, '_agent_morality', 0))
+        get_logs(trainer, env_obj, logdir, getattr(env_obj.env, '_moral_theory', "None"), getattr(env_obj.env, '_agent_morality', 0))
     if basedir:
         filenames = [f for f in listdir(mediadir) if isfile(
             join(mediadir, f)) and f.endswith(".png")]

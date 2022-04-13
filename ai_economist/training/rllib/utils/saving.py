@@ -133,8 +133,6 @@ def save_tf_model_weights(trainer, ckpt_dir, global_step, suffix=""):
 
 
 def load_tf_model_weights(trainer, ckpt):
-    print(os.getcwd())
-    print(ckpt)
     assert os.path.isfile(ckpt)
     with open(ckpt, "rb") as f:
         weights = pickle.load(f)

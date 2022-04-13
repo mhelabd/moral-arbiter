@@ -18,8 +18,18 @@ def make_env(
 	num_agents=4,
 	predefined_skill=False, 
 ):
-	morality = 'utilitarian' if morality[0].lower() == 'u' else 'virtue_ethics' if morality[0].lower() == 'v' else 'amoral'
+	m = morality[0].lower()
+	if m == 'u':
+		morality = 'utilitarian'
+	elif m == 'v':
+		morality = 'virtue_ethics'
+	elif m == 'a':
+		morality = 'AI'
+	else:
+		morality = 'amoral'
+
 	random_layout = 'random' if random_layout == 1 else 'layout'
+	random_layout = random_layout if morality != 'AI' else os.path.join(random_layout, 'phase2')
 	config_path = os.path.join(run_dir, morality, random_layout, 'config.yaml')
 	
 	with open(config_path, 'r') as f:
@@ -59,9 +69,21 @@ parser.add_argument('-am', '--agents_morality', type=float, nargs='+', help='lis
 parser.add_argument('-r', '--random_layout', type=int, help='whether random or layout', default=0)
 parser.add_argument('--run-dir', type=str, help='Path to the directory for this run.', default='envs/')
 parser.add_argument('--predefined_skill', action='store_true', help='Make env with predefined building skill.')
+parser.add_argument('--one_env', action='store_true', help='Make one env with 0.5 morality.')
 
 args = parser.parse_args()
 print(args)
+if args.one_env:
+	make_env(
+		args.morality, 
+		4, 
+		[0.5, 0.5, 0.5, 0.5], 
+		args.run_dir,
+		random_layout=args.random_layout, 
+		num_agents=args.num_agents,
+		predefined_skill=args.predefined_skill,
+	)
+	exit(0)
 for num_moral_agents in range(args.num_agents + 1):
 	for agent_morality in args.agents_morality:
 		make_env(
