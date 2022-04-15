@@ -17,6 +17,8 @@ def make_env(
 	random_layout=False, 
 	num_agents=4,
 	predefined_skill=False, 
+	use_gpu=False, 
+	visible_device_list=-1, 
 ):
 	m = morality[0].lower()
 	if m == 'u':
@@ -37,6 +39,22 @@ def make_env(
 
 	agent_morality = get_agent_morality(num_moral_agents, agent_morality)
 	print('agent_morality: ', agent_morality)
+	if use_gpu:
+		run_configuration['trainer']['num_gpus'] = 1
+		run_configuration['trainer']['num_workers'] = 12
+		run_configuration['general']['cpus'] = 12
+		run_configuration['general']['gpus'] = 1
+		run_configuration['trainer']['tf_session_args']['device_count']['CPU'] = 12
+		run_configuration['trainer']['tf_session_args']['device_count']['GPU'] = 1
+		run_configuration['trainer']['tf_session_args']['gpu_options']['visible_device_list'] = visible_device_list
+	else:
+		run_configuration['general']['cpus'] = 32
+		run_configuration['general']['gpus'] = 0
+		run_configuration['trainer']['num_workers'] = 32
+		run_configuration['trainer']['tf_session_args']['device_count']['CPU'] = 32
+		run_configuration['trainer']['tf_session_args']['device_count']['GPU'] = 0
+
+	run_configuration['trainer']['seed'] = 1024
 	run_configuration['env']['agent_morality'] = agent_morality
 	run_configuration['env']['n_agents'] = num_agents
 	agent_morality = [str(i) for i in agent_morality]
@@ -45,7 +63,7 @@ def make_env(
 	if predefined_skill: # Loads model with defined skill level
 		# run_configuration['env']['components'][0]['Build']['skill_dist'] = 'predefined'
 		run_configuration['general']['episodes'] = 100 # No need for training
-		run_configuration['env']['dense_log_frequency'] = 8
+		run_configuration['env']['dense_log_frequency'] = 1000 # Will log at the end
 		run_configuration['general']['train_planner'] = morality == 'AI'
 		run_configuration['general']['train_agent'] = True
 		run_configuration['general']['restore_tf_weights_agents'] = os.path.join('/home/mhelabd/ai-ethicist', new_path, 'ckpts/agent.tf.weights.global-step-25024000')
@@ -70,6 +88,9 @@ parser.add_argument('-r', '--random_layout', type=int, help='whether random or l
 parser.add_argument('--run-dir', type=str, help='Path to the directory for this run.', default='envs/')
 parser.add_argument('--predefined_skill', action='store_true', help='Make env with predefined building skill.')
 parser.add_argument('--one_env', action='store_true', help='Make one env with 0.5 morality.')
+parser.add_argument('--gpu', action='store_true', help='CPU VS GPU')
+parser.add_argument('--visible_device_list', type=str,  help='Which GPU', default='0')
+
 
 args = parser.parse_args()
 print(args)
@@ -82,6 +103,8 @@ if args.one_env:
 		random_layout=args.random_layout, 
 		num_agents=args.num_agents,
 		predefined_skill=args.predefined_skill,
+		use_gpu=args.gpu,
+		visible_device_list=args.visible_device_list, 
 	)
 	exit(0)
 for num_moral_agents in range(args.num_agents + 1):
@@ -94,5 +117,7 @@ for num_moral_agents in range(args.num_agents + 1):
 			random_layout=args.random_layout, 
 			num_agents=args.num_agents,
 			predefined_skill=args.predefined_skill,
+			use_gpu=args.gpu,
+			visible_device_list=args.visible_device_list, 
 		)
 

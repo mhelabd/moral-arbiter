@@ -5,6 +5,7 @@
 # or https://opensource.org/licenses/BSD-3-Clause
 
 import matplotlib.pyplot as plt
+plt.rcParams.update({'figure.max_open_warning': 0})
 import numpy as np
 
 from ai_economist.foundation import landmarks, resources

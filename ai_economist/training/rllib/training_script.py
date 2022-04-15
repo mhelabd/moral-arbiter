@@ -6,8 +6,11 @@
 
 import argparse
 import logging
-import os
 import sys
+logging.basicConfig(stream=sys.stdout, format="%(asctime)s %(message)s")
+logging.getLogger('matplotlib').setLevel(logging.CRITICAL)
+
+import os
 import time
 
 import ray
@@ -23,7 +26,6 @@ import tensorflow as tf
 
 ray.init(log_to_driver=False)
 
-logging.basicConfig(stream=sys.stdout, format="%(asctime)s %(message)s")
 logger = logging.getLogger("main")
 logger.setLevel(logging.DEBUG)
 
@@ -225,26 +227,28 @@ def maybe_sync_saez_buffer(trainer_obj, result_dict, run_configuration):
 
 
 def maybe_store_dense_log(
-    trainer_obj, result_dict, dense_log_freq, dense_log_directory
+    trainer_obj, result_dict, dense_log_freq, dense_log_directory, run_config
 ):
     if result_dict["episodes_this_iter"] > 0 and dense_log_freq > 0:
         episodes_per_replica = (
             result_dict["episodes_total"] // result_dict["episodes_this_iter"]
         )
-        if (episodes_per_replica % dense_log_freq) == 0: # 
+        if (episodes_per_replica % dense_log_freq) == 0 or result_dict["episodes_total"] >= run_config["general"]["episodes"]: 
             log_dir = os.path.join(
                 dense_log_directory,
                 "logs_{:016d}".format(result_dict["timesteps_total"]),
             )
             if not os.path.isdir(log_dir):
                 os.makedirs(log_dir)
-            saving.write_dense_logs(trainer_obj, log_dir)
+            # saving.write_dense_logs(trainer_obj, log_dir)
             logger.info(">> Wrote dense logs to: %s", log_dir)
             env = trainer.workers.local_worker().env
             original_stdout = sys.stdout
             log_file = open(log_dir + "/logfile.txt", "w+")
+            os.makedirs(os.path.join(log_dir, 'denselogs/'), exist_ok=True)
             sys.stdout = log_file
-            plots.play_random_episode(trainer_obj, env, plot_every=20, do_dense_logging=True, basedir=log_dir)
+            plots.get_logs(trainer_obj, env, os.path.join(log_dir, 'denselogs/'), getattr(env.env, '_moral_theory', "None"), getattr(env.env, '_agent_morality', 0))
+            # plots.play_random_episode(trainer_obj, env, plot_every=20, do_dense_logging=True, basedir=log_dir)
             sys.stdout = original_stdout
 
 def maybe_save(trainer_obj, result_dict, ckpt_freq, ckpt_directory, trainer_step_last_ckpt):
@@ -328,7 +332,7 @@ if __name__ == "__main__":
         maybe_sync_saez_buffer(trainer, result, run_config)
 
         # === Dense logging ===
-        maybe_store_dense_log(trainer, result, dense_log_frequency, dense_log_dir)
+        maybe_store_dense_log(trainer, result, dense_log_frequency, dense_log_dir, run_config)
 
         # === Saving ===
         step_last_ckpt = maybe_save(

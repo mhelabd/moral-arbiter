@@ -1,4 +1,5 @@
 import matplotlib.pyplot as plt
+plt.rcParams.update({'figure.max_open_warning': 0})
 import numpy as np
 from ai_economist.foundation.scenarios.utils import social_metrics
 from tutorials.utils import plotting
@@ -32,7 +33,7 @@ def get_logs(trainer, env, basedir=None, moral_theory="None", agent_morality=0):
         print("Productivity: {}".format(social_metrics.get_productivity(endows)))
         print("Moral Theory: {}".format(moral_theory))
         print("Agent Morality: {}".format(agent_morality))
-        # print("Learned Morality: {}".format(env.planner.state.get('curr_moral_values', 'None')))
+        print("Learned Morality: {}".format(env.env.world.planner.state.get('curr_moral_values', 'None')))
     return dense_logs
 
 

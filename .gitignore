@@ -147,3 +147,5 @@ cython_debug/
 ckpts/
 dense_logs/
 logfile.txt
+results.xlsx
+moral_values.txt

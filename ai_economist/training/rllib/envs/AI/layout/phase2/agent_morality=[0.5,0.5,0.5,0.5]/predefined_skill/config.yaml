@@ -60,7 +60,7 @@ env:
       - Labor
       - House
       top_moral_value: 10
-  dense_log_frequency: 8
+  dense_log_frequency: 1000
   energy_cost: 0.21
   energy_warmup_constant: 10000
   energy_warmup_method: auto
@@ -85,9 +85,9 @@ general:
   ckpt_frequency_steps: 20000000
   cpus: 12
   episodes: 100
-  gpus: 3
-  restore_tf_weights_agents: '/home/mhelabd/ai-ethicist/ai_economist/training/rllib/envs/AI/layout/phase2/ckpts/agent.tf.weights.global-step-120024000'
-  restore_tf_weights_planner: '/home/mhelabd/ai-ethicist/ai_economist/training/rllib/envs/AI/layout/phase2/ckpts/planner.tf.weights.global-step-120024000'
+  gpus: 1
+  restore_tf_weights_agents: /home/mhelabd/ai-ethicist/./ai_economist/training/rllib/envs/AI/layout/phase2/agent_morality=[0.5,0.5,0.5,0.5]/ckpts/agent.tf.weights.global-step-25024000
+  restore_tf_weights_planner: ''
   train_agent: true
   train_planner: true
 planner_policy:
@@ -124,14 +124,14 @@ trainer:
   num_workers: 12
   observation_filter: NoFilter
   rollout_fragment_length: 200
-  seed: null
+  seed: 1024
   sgd_minibatch_size: 1500
   shuffle_sequences: true
   tf_session_args:
     allow_soft_placement: true
     device_count:
       CPU: 12
-      GPU: 3
+      GPU: 1
     gpu_options:
       allow_growth: true
       visible_device_list: '1'

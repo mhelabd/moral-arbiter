@@ -4,8 +4,13 @@
 # For full license text, see the LICENSE file in the repo root
 # or https://opensource.org/licenses/BSD-3-Clause
 
+import logging
+import sys
 import numpy as np
 
+logging.basicConfig(stream=sys.stdout, format="%(asctime)s %(message)s")
+logger = logging.getLogger("main")
+logger.setLevel(logging.DEBUG)
 
 def get_gini(endowments):
     """Returns the normalized Gini index describing the distribution of endowments.
@@ -89,5 +94,7 @@ def total_utility(coin_endowments):
 def learned_utility(planner, coin_endowments, labors, stones, woods, num_houses, n_agents=4):
     planner_states = ['Coin', 'Labor', 'Stone', 'Wood', 'House']
     curr_value = [coin_endowments, labors, stones, woods, num_houses]
+    with open('/home/mhelabd/ai-ethicist/ai_economist/training/rllib/envs/AI/layout/phase2/moral_values.txt', 'w') as f:
+        f.write(str(planner.state['curr_moral_values']))
     utility = np.sum([planner.state['curr_moral_values'][planner_states[j] + str(i)] * curr_value[j][i] for i in range(n_agents) for j in range(len(planner_states))])
     return utility
