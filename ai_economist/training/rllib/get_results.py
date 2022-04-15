@@ -67,9 +67,15 @@ for ethic, HOME_DIR in {'virtue_ethics': VIRT_HOME_DIR, 'utilitarian': UTIL_HOME
     productivity_np[num_moral_agents][morality_coef_to_idx[morality_coef]] = productivity[og_k]
     eq_times_prod_np[num_moral_agents][morality_coef_to_idx[morality_coef]] = eq_times_prod[og_k]
   
-  for name, result in {'equality': equality_np, 'productivity': productivity_np, 'eq_times_prod': eq_times_prod_np}.items():
+  for name, result in {'equality': equality_np.T, 'productivity': productivity_np.T, 'eq_times_prod': eq_times_prod_np.T}.items():
     df = pd.DataFrame(result)
     # Write each dataframe to a different worksheet.
+    df.columns.name = '# Moral Agents'
+    df.index = list(morality_coef_to_idx.keys())
+    df.index.name = 'Moral Coef \ # Moral Agents'
+    df.columns = np.arange(equality_np.shape[0])
+    df.reset_index(inplace=True)
+    print(df)
     df.to_excel(writer, sheet_name=ethic + '_' + name)
 writer.save()
 
