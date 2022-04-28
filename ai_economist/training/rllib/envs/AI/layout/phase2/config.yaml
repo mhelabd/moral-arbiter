@@ -49,7 +49,7 @@ env:
   multi_action_mode_agents: false
   multi_action_mode_planner: true
   n_agents: 4
-  planner_gets_spatial_info: false
+  planner_gets_spatial_info: true
   planner_reward_type: coin_eq_times_productivity
   scenario_name: moral_layout_from_file/simple_wood_and_stone
   moral_theory: 'AI'
@@ -63,7 +63,7 @@ general:
   cpus: 12
   episodes: 4000000
   gpus: 3
-  restore_tf_weights_agents: 'envs/AI/layout/phase1/ckpts/agent.tf.weights.global-step-25032000'
+  restore_tf_weights_agents: 'envs/AI/layout/phase1/ckpts/agent.tf.weights.global-step-25008000'
   restore_tf_weights_planner: ''
   train_planner: true
 agent_policy:
