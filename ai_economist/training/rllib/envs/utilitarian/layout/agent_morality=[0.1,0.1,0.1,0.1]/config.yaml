@@ -58,8 +58,8 @@ env:
   flatten_observations: true
   isoelastic_eta: 0.23
   moral_theory: utilitarian
-  multi_action_mode_agents: true
-  multi_action_mode_planner: false
+  multi_action_mode_agents: false
+  multi_action_mode_planner: true
   n_agents: 4
   planner_gets_spatial_info: false
   planner_reward_type: coin_eq_times_productivity
@@ -70,7 +70,7 @@ env:
   - 25
 general:
   ckpt_frequency_steps: 1750000
-  cpus: 88
+  cpus: 28
   episodes: 25000
   gpus: 0
   restore_tf_weights_agents: ''
@@ -107,7 +107,7 @@ trainer:
   num_envs_per_worker: 1
   num_gpus: 0
   num_sgd_iter: 1
-  num_workers: 32
+  num_workers: 28
   observation_filter: NoFilter
   rollout_fragment_length: 200
   seed: 1024
@@ -116,7 +116,7 @@ trainer:
   tf_session_args:
     allow_soft_placement: true
     device_count:
-      CPU: 32
+      CPU: 28
       GPU: 0
     gpu_options:
       allow_growth: true

@@ -3,11 +3,18 @@ import argparse
 import os
 import yaml
 import numpy as np
+import re
+
+def atoi(text):
+    return int(text) if text.isdigit() else text
+
+def natural_keys(text):
+    return [ atoi(c) for c in re.split(r'(\d+)', text) ]
 
 def get_agent_morality(num_moral_agents, agent_morality, num_agents=4.):
 	moral_agents = agent_morality * np.ones(num_moral_agents)
 	immoral_agents = np.zeros(int(num_agents) - len(moral_agents))
-	return list([float(i) for i in np.concatenate((immoral_agents, moral_agents), axis=0)])
+	return list([float(i) for i in np.concatenate((moral_agents, immoral_agents), axis=0)])
 
 def make_env(
 	morality, 
@@ -48,10 +55,10 @@ def make_env(
 		run_configuration['trainer']['tf_session_args']['device_count']['GPU'] = 1
 		run_configuration['trainer']['tf_session_args']['gpu_options']['visible_device_list'] = visible_device_list
 	else:
-		run_configuration['general']['cpus'] = 32
+		run_configuration['general']['cpus'] = 28
 		run_configuration['general']['gpus'] = 0
-		run_configuration['trainer']['num_workers'] = 32
-		run_configuration['trainer']['tf_session_args']['device_count']['CPU'] = 32
+		run_configuration['trainer']['num_workers'] = 28
+		run_configuration['trainer']['tf_session_args']['device_count']['CPU'] = 28
 		run_configuration['trainer']['tf_session_args']['device_count']['GPU'] = 0
 
 	run_configuration['trainer']['seed'] = 1024
@@ -66,7 +73,13 @@ def make_env(
 		run_configuration['env']['dense_log_frequency'] = 1000 # Will log at the end
 		run_configuration['general']['train_planner'] = morality == 'AI'
 		run_configuration['general']['train_agent'] = True
-		run_configuration['general']['restore_tf_weights_agents'] = os.path.join('/home/mhelabd/ai-ethicist', new_path, 'ckpts/agent.tf.weights.global-step-25024000')
+		try:
+			results_folder =os.path.join('/home/mhelabd/ai-ethicist', new_path, 'ckpts')
+			results_files = [f for f in os.listdir(results_folder) if re.match(r'agent.tf.weights.global-step.*', f)]
+			results_files.sort(reverse=True, key=natural_keys)
+			run_configuration['general']['restore_tf_weights_agents'] = os.path.join(results_folder, results_files[0])
+		except:
+			print('NOT TRAINED: ', ('[' + ','.join(agent_morality) + ']'))
 		new_path = os.path.join(new_path, 'predefined_skill')
 
 	os.makedirs(new_path, exist_ok=True)

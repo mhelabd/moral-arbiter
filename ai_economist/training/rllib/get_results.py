@@ -21,11 +21,14 @@ for ethic, HOME_DIR in {'virtue_ethics': VIRT_HOME_DIR, 'utilitarian': UTIL_HOME
   for d in os.listdir(HOME_DIR):
     if os.path.isfile(os.path.join(HOME_DIR, d)):
       continue
-    results_file = os.path.join(HOME_DIR, d, 'predefined_skill/dense_logs/logs_0000000000108000/logfile.txt')
+    results_folder = os.path.join(HOME_DIR, d, 'predefined_skill/dense_logs/')
+    try:
+      results_file = os.path.join(results_folder, os.listdir(results_folder)[0], 'logfile.txt')
+    except:
+      print('FILE DOES NOT EXIST', results_folder)
+      continue
     if not os.path.isfile(results_file):
-      results_file = os.path.join(HOME_DIR, d, 'predefined_skill/dense_logs/logs_0000000000114000/logfile.txt')
-      if not os.path.isfile(results_file):
-        continue
+      continue
     curr_eq = []
     curr_prod = []
     curr_eq_times_prod = []
@@ -36,13 +39,10 @@ for ethic, HOME_DIR in {'virtue_ethics': VIRT_HOME_DIR, 'utilitarian': UTIL_HOME
       for m in re.finditer('Productivity:', results):
         curr_prod.append(float(results[m.end(): results.find('\n', m.end())]))
         curr_eq_times_prod.append(curr_eq[-1] * curr_prod[-1] / 4)
-    equality[d] = np.mean(curr_eq)
-    productivity[d] = np.mean(curr_prod)
-    eq_times_prod[d] = np.mean(curr_eq_times_prod)
+    equality[d] = np.median(curr_eq)
+    productivity[d] = np.median(curr_prod)
+    eq_times_prod[d] = np.median(curr_eq_times_prod)
   print(HOME_DIR)
-  # pprint.pprint(equality)
-  # pprint.pprint(productivity)
-  # pprint.pprint(eq_times_prod)   
   morality_coef_to_idx = {}
   equality_keys = list(equality.keys())
   equality_keys.sort()
@@ -50,7 +50,7 @@ for ethic, HOME_DIR in {'virtue_ethics': VIRT_HOME_DIR, 'utilitarian': UTIL_HOME
     og_k = k
     k = k[len('agent_morality=['):-1].split(',')
     k = [float(i) for i in k]
-    morality_coef = k[-1] # last one has the moral
+    morality_coef = k[0] # last one has the moral
     morality_coef_to_idx[morality_coef] = morality_coef_to_idx.get(morality_coef, len(morality_coef_to_idx.keys()))
   equality_np = np.zeros((5, len(morality_coef_to_idx.keys())))
   productivity_np = np.zeros((5, len(morality_coef_to_idx.keys())))
@@ -61,7 +61,7 @@ for ethic, HOME_DIR in {'virtue_ethics': VIRT_HOME_DIR, 'utilitarian': UTIL_HOME
     k = k[len('agent_morality=['):-1].split(',')
     k = [float(i) for i in k]
     num_moral_agents = (4 - np.sum(np.array(k) == 0.0))
-    morality_coef = k[-1] # last one has the moral
+    morality_coef = k[0] # last one has the moral
     
     equality_np[num_moral_agents][morality_coef_to_idx[morality_coef]] = v
     productivity_np[num_moral_agents][morality_coef_to_idx[morality_coef]] = productivity[og_k]

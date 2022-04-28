@@ -27,8 +27,8 @@ env:
   flatten_masks: true
   flatten_observations: true
   isoelastic_eta: 0.23
-  multi_action_mode_agents: true
-  multi_action_mode_planner: false
+  multi_action_mode_agents: false
+  multi_action_mode_planner: true
   n_agents: 4
   planner_gets_spatial_info: false
   planner_reward_type: coin_eq_times_productivity
