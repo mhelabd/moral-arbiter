@@ -262,7 +262,7 @@ def steal_str(all_steals, agent, income=True):
 
 def full_steal_str(all_steals, a_indices, income=True):
     s_head = "{} ({})".format("Income" if income else "Cost", "Steals")
-    ac_strings = [steal_str(all_steals, stealing_agent, income=True) for stealing_agent in a_indices]
+    ac_strings = [steal_str(all_steals, stealing_agent, income=income) for stealing_agent in a_indices]
     s_tail = " | ".join(ac_strings)
     return "{:<15}: {}".format(s_head, s_tail)
 
