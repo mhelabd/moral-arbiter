@@ -3,15 +3,37 @@ plt.rcParams.update({'figure.max_open_warning': 0})
 import numpy as np
 from ai_economist.foundation.scenarios.utils import social_metrics
 from tutorials.utils import plotting
-from os import makedirs
-from os import listdir
+from os import makedirs, listdir, remove
 from os.path import isfile, join
 import cv2
+import re
+import copy
 
+def get_episode_mp4(env, replay_log, basedir=None):
+    env = copy.deepcopy(env)
+    fig, ax = plt.subplots(1, 1, figsize=(10, 10))
+    _ = env.reset(force_dense_logging=True, **replay_log['reset']) # SET SEED
+    for i, replay_step in enumerate(replay_log['step']):
+        _ = env.step(**replay_step)
+        do_plot(env, ax, fig, i, basedir)
+    filenames = [f for f in listdir(basedir) if isfile(
+        join(basedir, f)) and f.endswith(".png")]
+    filenames = sorted(filenames, key=lambda x: int(x[:-len(".png")]))
+    frame = cv2.imread(join(basedir, filenames[0]))
+    height, width, layers = frame.shape
+    video = cv2.VideoWriter(join(basedir, 'video.mp4'), cv2.VideoWriter_fourcc(
+        *'mp4v'), 24, (width, height))
+    for image in filenames:
+        print(image, sep=",")
+        video.write(cv2.imread(join(basedir, image)))
+    video.release()
+    #delete images
+    for f in filenames:
+        remove(join(basedir, f))
 
-def get_logs(trainer, env, basedir=None, moral_theory="None", agent_morality=0):
+def get_logs(trainer, env, basedir=None, moral_theory="None", agent_morality=0, save_video=True):
     dense_logs = {}
-
+    replay_log = {}
     # Note: worker 0 is reserved for the trainer actor
     trainer_config = trainer.get_config()
     for worker in range((trainer_config["num_workers"] > 0), trainer_config["num_workers"] + 1):
@@ -19,6 +41,9 @@ def get_logs(trainer, env, basedir=None, moral_theory="None", agent_morality=0):
             dense_logs["worker={};env_id={}".format(worker, env_id)] = \
                 trainer.workers.foreach_worker(lambda w: w.async_env)[
                 worker].envs[env_id].env.previous_episode_dense_log
+            replay_log["worker={};env_id={}".format(worker, env_id)] = \
+                trainer.workers.foreach_worker(lambda w: w.async_env)[
+                worker].envs[env_id].env.previous_episode_replay_log
     for k, v in dense_logs.items():
         if v.get('world', []) == []: #TODO: fix this
             continue
@@ -34,6 +59,11 @@ def get_logs(trainer, env, basedir=None, moral_theory="None", agent_morality=0):
         print("Moral Theory: {}".format(moral_theory))
         print("Agent Morality: {}".format(agent_morality))
         print("Learned Morality: {}".format(env.env.world.planner.state.get('curr_moral_values', 'None')))
+        if basedir is not None and save_video:
+            mediadir = f'{basedir}{k}/media'
+            makedirs(mediadir, exist_ok=True)
+            worker_id, env_id = [int(x) for x in re.findall('[0-9]+', 'worker=1;env_id=0')]
+            get_episode_mp4(trainer.workers.foreach_worker(lambda w: w.async_env)[worker_id].envs[env_id].env, replay_log[k], basedir=mediadir)
     return dense_logs
 
 

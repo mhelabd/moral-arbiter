@@ -39,9 +39,9 @@ for ethic, HOME_DIR in {'virtue_ethics': VIRT_HOME_DIR, 'utilitarian': UTIL_HOME
       for m in re.finditer('Productivity:', results):
         curr_prod.append(float(results[m.end(): results.find('\n', m.end())]))
         curr_eq_times_prod.append(curr_eq[-1] * curr_prod[-1] / 4)
-    equality[d] = np.median(curr_eq)
-    productivity[d] = np.median(curr_prod)
-    eq_times_prod[d] = np.median(curr_eq_times_prod)
+    equality[d] = np.mean(curr_eq)
+    productivity[d] = np.mean(curr_prod)
+    eq_times_prod[d] = np.mean(curr_eq_times_prod)
   print(HOME_DIR)
   morality_coef_to_idx = {}
   equality_keys = list(equality.keys())
@@ -78,10 +78,3 @@ for ethic, HOME_DIR in {'virtue_ethics': VIRT_HOME_DIR, 'utilitarian': UTIL_HOME
     print(df)
     df.to_excel(writer, sheet_name=ethic + '_' + name)
 writer.save()
-
-  # for d in [equality_dict, productivity_dict, eq_times_prod_dict]:
-  #   print(np.array(d.values()))
-
-  # equality_np = np.zeros((len(equality)//4, 4))
-  # productivity_np = np.zeros((len(equality)//4, 4))
-  # eq_times_prod_np = np.zeros((len(equality)//4, 4))
