@@ -60,6 +60,7 @@ for thing_to_calc in ["total", "unit_cost", "count"]:
       v_df.columns.name = 'Agent #'
       k = k.replace('[', '(').replace(']', ')')
       k = k[len('agent_morality='):]
+      k = k[-28:]
       v_df.to_excel(writer, sheet_name=ethic + '_' + k)
     writer.save()
 
