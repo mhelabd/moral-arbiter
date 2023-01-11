@@ -7,22 +7,19 @@ with open('requirements.txt') as f:
     requirements = f.read().splitlines()
 
 setuptools.setup(
-    name="ai-economist",
+    name="moral-arbiter",
     version="1.6",
     author="Stephan Zheng, Alex Trott, Sunil Srinivasa",
-    author_email="stephan.zheng@salesforce.com",
-    description="Foundation: An Economics Simulation Framework",
+    author_email="mhelabd@stanford.edu",
+    description="Using Multi-Agent Reinforcement Learning to Simulate Moral Theories",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/salesforce/ai-economist",
+    url="https://github.com/mhelabd/moral-arbiter",
     packages=setuptools.find_packages(),
     package_data={
-        "ai_economist": [
+        "moral_arbiter": [
             "foundation/scenarios/simple_wood_and_stone/map_txt/*.txt",
-            "foundation/scenarios/covid19/*.cu",
-            "foundation/scenarios/covid19/key_to_check_activation_code_against",
             "foundation/components/*.cu",
-            "datasets/covid19_datasets/data_and_fitted_params/*"
         ],
     },
     include_package_data=True,

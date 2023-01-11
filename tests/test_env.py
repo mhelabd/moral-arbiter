@@ -10,7 +10,7 @@ Unit tests for the wood and stone scenario + basic components
 
 import unittest
 
-from ai_economist import foundation
+from moral_arbiter import foundation
 
 
 class CreateEnv:

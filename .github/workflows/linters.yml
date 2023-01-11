@@ -21,30 +21,30 @@ jobs:
         # INSTALLS
         python -m pip install --upgrade pip
         pip install -r requirements.txt
-        echo "PYTHONPATH=/home/runner/work/ai-economist-opensource/ai-economist-opensource/" >> $GITHUB_ENV
+        echo "PYTHONPATH=/home/runner/work/moral-arbiter-opensource/moral-arbiter-opensource/" >> $GITHUB_ENV
 
     - name: Sort imports with isort
       run: |
         # isort config compatible with black
-        isort --multi-line=3 --trailing-comma --force-grid-wrap=0 --use-parentheses --line-width=88  --check-only -rc ai_economist/
+        isort --multi-line=3 --trailing-comma --force-grid-wrap=0 --use-parentheses --line-width=88  --check-only -rc moral_arbiter/
       continue-on-error: false
 
     - name: Format code with black
       run: |
-        black --line-length 88 --check ai_economist/
+        black --line-length 88 --check moral_arbiter/
       continue-on-error: false
 
     - name: Lint code with flake8
       run: |
         # stop the build if there are Python syntax errors or undefined names
-        flake8 --count --select=E9,F63,F7,F82 --show-source --statistics ai_economist ai_economist/
+        flake8 --count --select=E9,F63,F7,F82 --show-source --statistics moral_arbiter moral_arbiter/
         # exit-zero treats all errors as warnings. Also outputs error counts
         # Add as many codes under --ignore for the checks to ignore
         # E203: Whitespace before ':' (will be taken care of by Black)
         # C901: Function is too complex
         # W503: Line break occurred before a binary operator (Black is expected to take care of formatting)
         # F401: Module imported but unused
-        flake8  --ignore=E203,C901,W503,F401 --count --max-complexity=15 --max-line-length=88 --statistics ai_economist/
+        flake8  --ignore=E203,C901,W503,F401 --count --max-complexity=15 --max-line-length=88 --statistics moral_arbiter/
 
     - name: Lint code with pylint
       run: |
@@ -85,7 +85,7 @@ jobs:
         too-many-nested-blocks,\
         too-many-public-methods,\
         too-many-statements \
-        ai_economist/
+        moral_arbiter/
 
     - name: Test with pytest
       run: |
